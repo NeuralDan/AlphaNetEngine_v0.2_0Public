@@ -44,7 +44,7 @@ public class CoreEngine implements Runnable {
     protected void init() throws Exception{
         window.init();
         timer.init();
-        game.init();
+        game.init(window);
     }
 
     protected void gameLoop(){

@@ -2,7 +2,9 @@ package game;
 
 import Engine.core.*;
 import Engine.rendering.*;
+import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -19,30 +21,24 @@ public class TestGame implements IGame {
     private Loader loader = new Loader();
 
     private RawModel model;
+    private RawModel model2;
 
     private TexturedModel texturedModel;
 
     private Entity entity;
-    private Entity entity1;
 
-    private Matrix4f projectionMatrix;
-    private Matrix4f worldMatrix;
-
-    private static final float FOV = (float) Math.toRadians(60.0f);
-
-    private static final float Z_NEAR = 0.01f;
-
-    private static final float Z_FAR = 1000.0f;
+    private Camera camera;
 
     @Override
-    public void init() throws Exception {
-        renderer = new EntityRenderer();
-        renderer.init();
+    public void init(Window window) throws Exception {
+        camera = new Camera();
+        renderer = new EntityRenderer(window, camera);
+
         float[] vertices = {
-                -0.5f,  0.5f, 0.0f,
-                -0.5f, -0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f,
-                0.5f,  0.5f, 0.0f,
+                -0.5f,  0.5f,  0.5f,
+                -0.5f, -0.5f,  0.5f,
+                0.5f, -0.5f,  0.5f,
+                0.5f,  0.5f,  0.5f,
         };
 
         int[] indices = {
@@ -58,10 +54,8 @@ public class TestGame implements IGame {
 
         model = loader.loadToVAO(vertices, textureCoords, indices);
 
-        texturedModel = new TexturedModel(model, new Texture("AvengersLogo.png"));
-        TexturedModel texturedModel1 = new TexturedModel(model, new Texture("nightBack.png"));
-        entity = new Entity(texturedModel);
-        entity1 = new Entity(texturedModel1);
+        texturedModel = new TexturedModel(model, new ModelTexture(loader.loadTexture("AvengersLogo")));
+        entity = new Entity(texturedModel, new Vector3f(0,0,0), 0, 0, 0, 1);
         entities.add(entity);
     }
 
@@ -73,17 +67,23 @@ public class TestGame implements IGame {
     @Override
     public void update(float interval) {
 
+        //System.out.println(entity.getPosition().toString());
     }
 
     @Override
     public void render(Window window) {
-        renderer.renderEntity(entity1, window);
+        //entity.increasePos(0, 0, -0.02f);
+        //System.out.println(entity.getPosition().toString());
+        //entity.increaseRot(0, 1, 0);
+        camera.move();
+        renderer.renderEntity(entity);
+
         window.setClearColor(0, 1, 0, 0.0f);
     }
 
     @Override
     public void cleanUp(){
         loader.cleanUp();
-        texturedModel.getTexture().cleanUp();
+        renderer.cleanUp();
     }
 }

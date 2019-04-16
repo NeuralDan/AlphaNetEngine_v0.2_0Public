@@ -1,7 +1,6 @@
 package Engine.core;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.*;
 
 public class ResourceLoader {
 

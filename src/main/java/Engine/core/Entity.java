@@ -8,19 +8,33 @@ public class Entity extends GameObject {
     private TexturedModel model;
 
     private Vector3f position;
-    private Vector3f rotation;
+    private float rotX, rotY, rotZ;
 
     private float scale;
 
-    public Entity(TexturedModel model){
+    public Entity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale){
         this.model = model;
-        this.position = new Vector3f(0,0,0);
-        this.scale = 1;
-        this.rotation = new Vector3f(0,0,0);
+        this.position = position;
+        this.scale = scale;
+        this.rotX = rotX;
+        this.rotY = rotY;
+        this.rotZ = rotZ;
     }
 
     public Vector3f getPosition(){
         return position;
+    }
+
+    public void increasePos(float dx, float dy, float dz){
+        this.position.x += dx;
+        this.position.y += dy;
+        this.position.z += dz;
+    }
+
+    public void increaseRot(float dx, float dy, float dz){
+        this.rotX += dx;
+        this.rotY += dy;
+        this.rotZ += dz;
     }
 
     public void setPosition(float x, float y, float z){
@@ -37,17 +51,19 @@ public class Entity extends GameObject {
         this.scale = scale;
     }
 
-    public Vector3f getRotation() {
-        return rotation;
-    }
-
-    public void setRotation(float x, float y, float z) {
-        this.rotation.x = x;
-        this.rotation.y = y;
-        this.rotation.z = z;
-    }
-
     public TexturedModel getModel(){
         return model;
+    }
+
+    public float getRotX() {
+        return rotX;
+    }
+
+    public float getRotY() {
+        return rotY;
+    }
+
+    public float getRotZ() {
+        return rotZ;
     }
 }

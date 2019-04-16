@@ -1,8 +1,9 @@
 package game;
 
+import Engine.core.Camera;
 import Engine.core.ResourceLoader;
+import Engine.core.Transform;
 import Engine.rendering.Shader;
-import Engine.rendering.Texture;
 import org.joml.Matrix4f;
 
 public class BasicShader extends Shader {
@@ -14,17 +15,22 @@ public class BasicShader extends Shader {
         addFragmentShader(ResourceLoader.loadShader("basicShader.fs"));
         compileShader();
 
-        addUniform("textureSampler");
+        addUniform("transformationMatrix");
         //addUniform("projectionMatrix");
-        //addUniform("worldMatrix");
+        addUniform("viewMatrix");
     }
 
-    @Override
-    public void updateUniforms(Texture texture){
-        texture.bind();
-        setUniformi("textureSampler", 0);
-        //setUniform("projectionMatrix", projectionMatrix);
-        //setUniform("worldMatrix", worldMatrix);
+    public void loadProjectionMatrix(Matrix4f matrix){
+        setUniform("projectionMatrix", matrix);
+    }
+
+    public void loadViewMatrix(Camera camera){
+        Matrix4f viewMatrix = Transform.createViewMatrix(camera);
+        setUniform("viewMatrix", viewMatrix);
+    }
+
+    public void loadTransformationMatrix(Matrix4f matrix){
+        setUniform("transformationMatrix", matrix);
     }
 
 }

@@ -8,7 +8,7 @@ public class Main {
         try{
             boolean vSync = true;
             IGame game = new TestGame();
-            CoreEngine engine = new CoreEngine("GAME", 600, 480, vSync, game);
+            CoreEngine engine = new CoreEngine("GAME", 1280, 720, vSync, game);
             engine.start();
         }catch (Exception e){
             e.printStackTrace();

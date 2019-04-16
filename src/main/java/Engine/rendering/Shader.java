@@ -81,10 +81,6 @@ public class Shader {
         return shader;
     }
 
-    public void updateUniforms(Texture texture){
-
-    }
-
     public void addUniform(String uniformName){
         int uniformLocation = glGetUniformLocation(program, uniformName);
 

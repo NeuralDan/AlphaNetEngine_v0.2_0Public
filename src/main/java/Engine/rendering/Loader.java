@@ -1,20 +1,28 @@
 package Engine.rendering;
 
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.stb.STBImage.*;
 
 public class Loader {
 
     private ArrayList<Integer> vaos = new ArrayList<Integer>();
     private ArrayList<Integer> vbos = new ArrayList<Integer>();
+    private ArrayList<Integer> textures = new ArrayList<Integer>();
 
     public RawModel loadToVAO(float[] positions, float[] textureCoords, int[] indices){
         int vaoID = 0;
@@ -27,6 +35,33 @@ public class Loader {
         }finally {
             return new RawModel(vaoID, indices.length);
         }
+    }
+
+    public int loadTexture(String fileName){
+        ByteBuffer image;
+        int width, height;
+        int id = glGenTextures();
+        try(MemoryStack stack = MemoryStack.stackPush()){
+            IntBuffer w = stack.mallocInt(1);
+            IntBuffer h = stack.mallocInt(1);
+            IntBuffer comp = stack.mallocInt(1);
+
+            image = stbi_load("res/textures/"+fileName+".png", w, h, comp, 4);
+            if(image == null){
+                throw new RuntimeException("Failed to load a texture file! File: "+ fileName+ " " + System.lineSeparator() + stbi_failure_reason());
+            }
+            width = w.get();
+            height = h.get();
+        }
+        glBindTexture(GL_TEXTURE_2D, id);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+        return id;
     }
 
     private int createVAO(){
@@ -97,6 +132,10 @@ public class Loader {
         glBindVertexArray(0);
         for(int vao : vaos){
             glDeleteVertexArrays(vao);
+        }
+
+        for(int texture : textures){
+            glDeleteTextures(texture);
         }
     }
 

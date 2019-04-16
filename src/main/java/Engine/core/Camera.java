@@ -17,6 +17,9 @@ public class Camera {
         if(CoreEngine.isKeyPressed(GLFW_KEY_W)){
             position.z -= 0.02f;
         }
+        if(CoreEngine.isKeyPressed(GLFW_KEY_S)){
+            position.z += 0.02f;
+        }
         if(CoreEngine.isKeyPressed(GLFW_KEY_D)){
             position.x += 0.02f;
         }

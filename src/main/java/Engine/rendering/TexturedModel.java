@@ -3,9 +3,9 @@ package Engine.rendering;
 public class TexturedModel {
 
     private RawModel model;
-    private Texture texture;
+    private ModelTexture texture;
 
-    public TexturedModel(RawModel model, Texture texture) {
+    public TexturedModel(RawModel model, ModelTexture texture) {
         this.model = model;
         this.texture = texture;
     }
@@ -14,7 +14,7 @@ public class TexturedModel {
         return model;
     }
 
-    public Texture getTexture() {
+    public ModelTexture getTexture() {
         return texture;
     }
 
