@@ -16,7 +16,7 @@ public class BasicShader extends Shader {
         compileShader();
 
         addUniform("transformationMatrix");
-        //addUniform("projectionMatrix");
+        addUniform("projectionMatrix");
         addUniform("viewMatrix");
     }
 

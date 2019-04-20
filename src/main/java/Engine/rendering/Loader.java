@@ -20,24 +20,25 @@ import static org.lwjgl.stb.STBImage.*;
 
 public class Loader {
 
-    private ArrayList<Integer> vaos = new ArrayList<Integer>();
-    private ArrayList<Integer> vbos = new ArrayList<Integer>();
-    private ArrayList<Integer> textures = new ArrayList<Integer>();
+    private static ArrayList<Integer> vaos = new ArrayList<Integer>();
+    private static ArrayList<Integer> vbos = new ArrayList<Integer>();
+    private static ArrayList<Integer> textures = new ArrayList<Integer>();
 
-    public RawModel loadToVAO(float[] positions, float[] textureCoords, int[] indices){
+    public static RawModel loadToVAO(float[] positions, float[] textureCoords, float[] normals, int[] indices){
         int vaoID = 0;
         try{
             vaoID = createVAO();
             bindIndicesBuffer(indices);
             storeDataInAttributeList(0, 3, positions);
             storeDataInAttributeList(1, 2, textureCoords);
+            storeDataInAttributeList(2, 3, normals);
             unbindVAO();
         }finally {
             return new RawModel(vaoID, indices.length);
         }
     }
 
-    public int loadTexture(String fileName){
+    public static int loadTexture(String fileName){
         ByteBuffer image;
         int width, height;
         int id = glGenTextures();
@@ -64,14 +65,14 @@ public class Loader {
         return id;
     }
 
-    private int createVAO(){
+    private static int createVAO(){
         int vaoID = glGenVertexArrays();
         vaos.add(vaoID);
         glBindVertexArray(vaoID);
         return vaoID;
     }
 
-    private void storeDataInAttributeList(int attributeNumber, int coordSize, float[] values){
+    private static void storeDataInAttributeList(int attributeNumber, int coordSize, float[] values){
         int vboID = 0;
         FloatBuffer buffer = null;
         try {
@@ -88,7 +89,7 @@ public class Loader {
         }
     }
 
-    private void bindIndicesBuffer(int[] indices){
+    private static void bindIndicesBuffer(int[] indices){
         int vboID = 0;
         IntBuffer buffer = null;
         try{
@@ -104,25 +105,26 @@ public class Loader {
         }
     }
 
-    private void unbindVAO(){
+    private static void unbindVAO(){
         glBindVertexArray(0);
     }
 
-    private FloatBuffer storeDataInFloatBuffer(float[] data){
+    private static FloatBuffer storeDataInFloatBuffer(float[] data){
         FloatBuffer buffer = MemoryUtil.memAllocFloat(data.length);
         buffer.put(data).flip();
         return buffer;
     }
 
-    private IntBuffer storeDataInIntBuffer(int[] data){
+    private static IntBuffer storeDataInIntBuffer(int[] data){
         IntBuffer buffer = MemoryUtil.memAllocInt(data.length);
         buffer.put(data).flip();
         return buffer;
     }
 
-    public void cleanUp(){
+    public static void cleanUp(){
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         for(int vbo : vbos){

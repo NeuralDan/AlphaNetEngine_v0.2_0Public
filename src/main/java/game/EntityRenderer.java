@@ -14,10 +14,8 @@ import static org.lwjgl.opengl.GL30.*;
 public class EntityRenderer {
 
     private static final float FOV = (float) Math.toRadians(60.0f);
-    private static final float NEAR_PLANE = 0.01f;
-    private static final float FAR_PLANE = 1000;
-
-    private Matrix4f projectionMatrix;
+    private static final float Z_NEAR = 0.01f;
+    private static final float Z_FAR = 1000.0f;
 
     private BasicShader shader;
 
@@ -27,8 +25,6 @@ public class EntityRenderer {
     public EntityRenderer(Window window, Camera camera){
         shader = new BasicShader();
         this.window = window;
-        createProjectionMatrix();
-        //shader.loadProjectionMatrix(projectionMatrix);
         this.camera = camera;
     }
 
@@ -48,9 +44,13 @@ public class EntityRenderer {
         }
         shader.bind();
 
+        Matrix4f projectionMatrix = Transform.createProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
+        shader.loadProjectionMatrix(projectionMatrix);
+
         glBindVertexArray(model.getVaoID());
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(2);
         Matrix4f transformationMatrix = Transform.createTransformationMatrix(entity.getPosition(),
                 entity.getRotX(), entity.getRotY(), entity.getRotZ(), entity.getScale());
         shader.loadTransformationMatrix(transformationMatrix);
@@ -60,22 +60,24 @@ public class EntityRenderer {
         glDrawElements(GL_TRIANGLES, model.getVertexCount(), GL_UNSIGNED_INT, 0);
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
         glBindVertexArray(0);
 
         shader.unbind();
     }
 
-    private void createProjectionMatrix(){
-        float aspectRatio = (float)window.getWidth() / (float)window.getHeight();
+//    private void createProjectionMatrix(){
+//        float aspectRatio = (float)window.getWidth() / (float)window.getHeight();
 //        float halfWidth = 1.0f;
 //        float halfHeight = halfWidth/aspectRatio;
+//        projectionMatrix = new Matrix4f();
 //        projectionMatrix = Projection.perspective(-halfWidth, halfWidth, -halfHeight, halfHeight, NEAR_PLANE, FAR_PLANE);
-
-        projectionMatrix = new Matrix4f();
-        projectionMatrix.identity();
-        projectionMatrix.setPerspective(FOV, aspectRatio, NEAR_PLANE, FAR_PLANE);
-
-
+//
+//        projectionMatrix = new Matrix4f();
+//        projectionMatrix.identity();
+//        projectionMatrix.setPerspective(FOV, aspectRatio, NEAR_PLANE, FAR_PLANE);
+//
+//
 //        float y_scale = (float) ((1f / Math.tan(Math.toRadians(FOV / 2f))) * aspectRatio);
 //        float x_scale = y_scale / aspectRatio;
 //        float frustum_length = FAR_PLANE - NEAR_PLANE;
@@ -87,7 +89,7 @@ public class EntityRenderer {
 //        projectionMatrix.m23(-1);
 //        projectionMatrix.m32(-((2 * NEAR_PLANE * FAR_PLANE) / frustum_length));
 //        projectionMatrix.m33(0);
-    }
+//    }
 
     public void cleanUp(){
         shader.cleanUp();
