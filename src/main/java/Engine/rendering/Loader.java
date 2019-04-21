@@ -123,8 +123,6 @@ public class Loader {
 
     public static void cleanUp(){
         glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glDisableVertexAttribArray(2);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         for(int vbo : vbos){

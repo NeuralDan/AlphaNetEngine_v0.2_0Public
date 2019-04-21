@@ -28,8 +28,8 @@ public class Transform {
     public static Matrix4f createViewMatrix(Camera camera){
         Matrix4f viewMatrix = new Matrix4f();
         viewMatrix.identity();
-        viewMatrix.rotateX((float)Math.toRadians(camera.getPitch()));
-        viewMatrix.rotateY((float)Math.toRadians(camera.getYaw()));
+        viewMatrix.rotateX((float)Math.toRadians(camera.getRotation().x));
+        viewMatrix.rotateY((float)Math.toRadians(camera.getRotation().y));
         Vector3f cameraPos = camera.getPosition();
         Vector3f negCameraPos = new Vector3f(-cameraPos.x, -cameraPos.y, -cameraPos.z);
         viewMatrix.translate(negCameraPos);

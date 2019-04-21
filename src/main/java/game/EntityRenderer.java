@@ -6,6 +6,8 @@ import Engine.core.Transform;
 import Engine.rendering.*;
 import org.joml.Matrix4f;
 
+import java.util.List;
+
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL20.*;
@@ -33,10 +35,8 @@ public class EntityRenderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void renderEntity(Entity entity){
+    public void renderEntity(List<Entity> entities){
         prepare();
-        TexturedModel texturedModel = entity.getModel();
-        RawModel model = texturedModel.getModel();
 
         if(window.isResize()){
             glViewport(0, 0, window.getWidth(), window.getHeight());
@@ -46,50 +46,36 @@ public class EntityRenderer {
 
         Matrix4f projectionMatrix = Transform.createProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
         shader.loadProjectionMatrix(projectionMatrix);
+        shader.loadViewMatrix(camera);
 
-        glBindVertexArray(model.getVaoID());
+        for(Entity entity : entities){
+            TexturedModel texturedModel = entity.getModel();
+            Matrix4f transformationMatrix = Transform.createTransformationMatrix(entity.getPosition(),
+                    entity.getRotX(), entity.getRotY(), entity.getRotZ(), entity.getScale());
+            shader.loadTransformationMatrix(transformationMatrix);
+
+            enable(texturedModel);
+            glDrawElements(GL_TRIANGLES, texturedModel.getModel().getVertexCount(), GL_UNSIGNED_INT, 0);
+            disable();
+        }
+        shader.unbind();
+    }
+
+    public void enable(TexturedModel model){
+        glBindVertexArray(model.getModel().getVaoID());
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);
-        Matrix4f transformationMatrix = Transform.createTransformationMatrix(entity.getPosition(),
-                entity.getRotX(), entity.getRotY(), entity.getRotZ(), entity.getScale());
-        shader.loadTransformationMatrix(transformationMatrix);
-        shader.loadViewMatrix(camera);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texturedModel.getTexture().getTextureID());
-        glDrawElements(GL_TRIANGLES, model.getVertexCount(), GL_UNSIGNED_INT, 0);
+        shader.loadMaterial(model.getMaterial());
+    }
+
+    public void disable(){
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glDisableVertexAttribArray(2);
         glBindVertexArray(0);
-
-        shader.unbind();
     }
-
-//    private void createProjectionMatrix(){
-//        float aspectRatio = (float)window.getWidth() / (float)window.getHeight();
-//        float halfWidth = 1.0f;
-//        float halfHeight = halfWidth/aspectRatio;
-//        projectionMatrix = new Matrix4f();
-//        projectionMatrix = Projection.perspective(-halfWidth, halfWidth, -halfHeight, halfHeight, NEAR_PLANE, FAR_PLANE);
-//
-//        projectionMatrix = new Matrix4f();
-//        projectionMatrix.identity();
-//        projectionMatrix.setPerspective(FOV, aspectRatio, NEAR_PLANE, FAR_PLANE);
-//
-//
-//        float y_scale = (float) ((1f / Math.tan(Math.toRadians(FOV / 2f))) * aspectRatio);
-//        float x_scale = y_scale / aspectRatio;
-//        float frustum_length = FAR_PLANE - NEAR_PLANE;
-//
-//        projectionMatrix = new Matrix4f();
-//        projectionMatrix.m00(x_scale);
-//        projectionMatrix.m11(y_scale);
-//        projectionMatrix.m22(-((FAR_PLANE + NEAR_PLANE) / frustum_length));
-//        projectionMatrix.m23(-1);
-//        projectionMatrix.m32(-((2 * NEAR_PLANE * FAR_PLANE) / frustum_length));
-//        projectionMatrix.m33(0);
-//    }
 
     public void cleanUp(){
         shader.cleanUp();

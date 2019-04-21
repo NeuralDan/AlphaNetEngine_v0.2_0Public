@@ -1,10 +1,10 @@
 package Engine.rendering;
 
-public class ModelTexture {
+public class Texture {
 
     private int textureID;
 
-    public ModelTexture(int id){
+    public Texture(int id){
         this.textureID = id;
     }
 

@@ -17,10 +17,12 @@ public class CoreEngine implements Runnable {
     private IGame game;
 
     private static Window window;
+    private static MouseInput mouseInput;
 
     public CoreEngine(String title, int width, int height, boolean vSync, IGame game) throws Exception{
         gameLoopThread = new Thread(this, "GAME_LOOP_THREAD");
         window = new Window(title, width, height, vSync);
+        mouseInput = new MouseInput();
         this.game = game;
         timer = new Timer();
     }
@@ -43,6 +45,7 @@ public class CoreEngine implements Runnable {
 
     protected void init() throws Exception{
         window.init();
+        mouseInput.init(window);
         timer.init();
         game.init(window);
     }
@@ -92,11 +95,12 @@ public class CoreEngine implements Runnable {
     }
 
     protected void input(){
-        game.input(this);
+        mouseInput.input(window);
+        game.input(mouseInput);
     }
 
     protected void update(float interval){
-        game.update(interval);
+        game.update(interval, mouseInput);
     }
 
     protected void render(){
